@@ -317,23 +317,81 @@ function logHistory(object, confidence, type) {
     historyList.prepend(item);
 }
 
-// --- FITUR EXPORT HISTORY KE EXCEL (.CSV) ---
+// --- FITUR EXPORT HISTORY KE EXCEL (.XLS / TABLES) ---
 function exportHistoryToExcel() {
     if (detectionLogs.length === 0) {
         alert("Belum ada data riwayat deteksi untuk di-export!");
         return;
     }
 
-    let csvContent = "data:text/csv;charset=utf-8,Tanggal,Waktu,Objek Terdeteksi,Akurasi,Status Sistem\n";
+    // Nama Sheet diset menjadi "laporan metal detector"
+    const sheetName = "Laporan Metal Detector";
+
+    // Membuat struktur tabel HTML rapi berwarna untuk Excel
+    let tableHtml = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+          xmlns:x="urn:schemas-microsoft-com:office:excel" 
+          xmlns="http://www.w3.org/TR/REC-html40">
+    <head>
+        <meta charset="UTF-8">
+        <!--[if gte mso 9]>
+        <xml>
+            <x:ExcelWorkbook>
+                <x:ExcelWorksheets>
+                    <x:ExcelWorksheet>
+                        <x:Name>${sheetName}</x:Name>
+                        <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+                    </x:ExcelWorksheet>
+                </x:ExcelWorksheets>
+            </x:ExcelWorkbook>
+        </xml>
+        <![endif]-->
+        <style>
+            body { font-family: 'Segoe UI', Arial, sans-serif; }
+            th { background-color: #0284c7; color: #ffffff; font-size: 12px; font-weight: bold; padding: 10px; border: 1px solid #cbd5e1; }
+            td { font-size: 11px; padding: 8px; border: 1px solid #cbd5e1; text-align: center; }
+            .title { background-color: #0f172a; color: #ffffff; font-size: 16px; font-weight: bold; text-align: center; padding: 12px; }
+            .sub { color: #64748b; font-size: 11px; italic: true; text-align: center; }
+            .status-metal { background-color: #fee2e2; color: #b91c1c; font-weight: bold; }
+            .status-clear { background-color: #dcfce7; color: #15803d; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <table>
+            <tr><td colspan="5" class="title">LAPORAN RIWAYAT DETEKSI METAL DETECTOR</td></tr>
+            <tr><td colspan="5" class="sub">Sistem Deteksi Objek Logam Berbasis AI Computer Vision</td></tr>
+            <tr><td colspan="5"></td></tr>
+            <tr>
+                <th>Tanggal</th>
+                <th>Waktu</th>
+                <th>Objek Terdeteksi</th>
+                <th>Akurasi (Confidence)</th>
+                <th>Status Sistem</th>
+            </tr>`;
 
     detectionLogs.forEach(row => {
-        csvContent += `${row.date},${row.time},${row.object},${row.confidence},${row.status}\n`;
+        const statusClass = row.status === 'METAL' ? 'status-metal' : 'status-clear';
+        tableHtml += `
+            <tr>
+                <td>${row.date}</td>
+                <td>${row.time}</td>
+                <td style="text-align: left;">${row.object}</td>
+                <td>${row.confidence}</td>
+                <td class="${statusClass}">${row.status}</td>
+            </tr>`;
     });
 
-    const encodedUri = encodeURI(csvContent);
+    tableHtml += `
+        </table>
+    </body>
+    </html>`;
+
+    // Proses Download File dengan Format XLS Rapi
+    const blob = new Blob([tableHtml], { type: "application/vnd.ms-excel;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `metal_detection_log_${Date.now()}.csv`);
+    link.href = url;
+    link.download = `Laporan_Metal_Detector_${Date.now()}.xls`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
