@@ -207,6 +207,7 @@ video, canvas {
     background: rgba(16, 185, 129, 0.1);
 }
 
+/* Perbaikan Panel Kontrol Kamera agar Tombol Berjajar Rapi 2 Kolom */
 .control-panel {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -217,7 +218,7 @@ video, canvas {
     background: #1e293b;
     color: var(--text-main);
     border: 1px solid #334155;
-    padding: 10px;
+    padding: 12px 10px;
     font-size: 0.8rem;
     border-radius: 6px;
     display: flex;
@@ -415,13 +416,18 @@ video, canvas {
 .state-badge.green { color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
 .state-badge.red { color: var(--accent-red); background: rgba(239, 68, 68, 0.1); }
 
-/* History Container */
+/* History Container & Scroll Area */
+.arduino-section {
+    display: flex;
+    flex-direction: column;
+}
+
 .history-container {
     background: #0b0f19;
     border: 1px solid var(--card-border);
     border-radius: 6px;
     padding: 12px;
-    max-height: 180px;
+    max-height: 150px;
     overflow-y: auto;
 }
 .history-container h4 { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); margin-bottom: 8px; }
@@ -440,6 +446,43 @@ video, canvas {
     border-left: 3px solid var(--accent-green);
 }
 .history-item.metal { border-left-color: var(--accent-red); }
+
+/* Container untuk Tombol Export Excel */
+.history-actions {
+    margin-top: 5px;
+    display: flex;
+    width: 100%;
+}
+
+/* Styling Tombol Export Excel khas Microsoft Excel */
+.btn-action.excel-btn {
+    width: 100%;
+    background-color: #107c41; 
+    color: #ffffff;
+    border: none;
+    padding: 12px;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace, sans-serif;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 12px rgba(16, 124, 65, 0.25);
+}
+
+.btn-action.excel-btn:hover {
+    background-color: #0b5c30;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 124, 65, 0.4);
+}
+
+.btn-action.excel-btn:active {
+    transform: translateY(0);
+}
 
 /* Init Overlay */
 .init-overlay {
@@ -474,7 +517,7 @@ body.presentation-mode .dashboard-grid {
 body.presentation-mode .camera-section { grid-row: span 2; }
 body.presentation-mode .history-container { display: none; }
 
-/* Mobile Mode */
+/* Mobile Mod */
 @media screen and (max-width: 768px) {
     body {
         padding: 10px;
@@ -486,5 +529,12 @@ body.presentation-mode .history-container { display: none; }
     video, canvas {
         width: 100% !important;
         height: auto !important;
+    }
+    .history-actions {
+        justify-content: center;
+    }
+    .btn-action.excel-btn {
+        width: 100%;
+        justify-content: center;
     }
 }

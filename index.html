@@ -55,7 +55,7 @@
 
         <!-- MAIN GRID LAYOUT -->
         <main class="dashboard-grid">
-            
+
             <!-- LEFT COLUMN: CAMERA & CONTROLS -->
             <section class="card camera-section">
                 <div class="card-header">
@@ -88,7 +88,7 @@
                 <div class="card-header">
                     <h2><i class="fa-solid fa-chart-line"></i> DETECTION STATUS</h2>
                 </div>
-                
+
                 <div class="status-card-large" id="mainStatusCard">
                     <div class="status-icon" id="mainStatusIcon">🟢</div>
                     <div class="status-text-group">
@@ -138,7 +138,7 @@
             <!-- RIGHT COLUMN: DIGITAL ARDUINO CONTROLLER -->
             <section class="card arduino-section">
                 <div class="card-header">
-                    <h2><i class="fa-solid microchip"></i> DIGITAL ARDUINO CONTROLLER</h2>
+                    <h2><i class="fa-solid fa-microchip"></i> DIGITAL ARDUINO CONTROLLER</h2>
                     <span class="arduino-badge"><span class="pulse-dot"></span> ONLINE</span>
                 </div>
 
@@ -151,7 +151,7 @@
                 <!-- DIGITAL OUTPUT PANEL -->
                 <div class="outputs-panel">
                     <h3>DIGITAL OUTPUT</h3>
-                    
+
                     <div class="output-row" id="rowRedLed">
                         <div class="output-info">
                             <span class="led-indicator red-led" id="uiRedLed"></span>
@@ -184,6 +184,14 @@
                         <div class="history-empty">No detections recorded yet.</div>
                     </div>
                 </div>
+
+                <!-- TOMBOL EXPORT EXCEL (YANG SEBELUMNYA KURANG) -->
+                <div class="history-actions">
+                    <button onclick="exportHistoryToExcel()" class="btn-action excel-btn">
+                        <i class="fa-solid fa-file-excel"></i> EXPORT TO EXCEL (.CSV)
+                    </button>
+                </div>
+
             </section>
 
         </main>
