@@ -473,3 +473,18 @@ body.presentation-mode .dashboard-grid {
 }
 body.presentation-mode .camera-section { grid-row: span 2; }
 body.presentation-mode .history-container { display: none; }
+
+/* Mobile Mode */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    .main-container, .dashboard-layout {
+        flex-direction: column;
+        width: 100%;
+    }
+    video, canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
+}
