@@ -1,0 +1,76 @@
+/*
+  AI Metal Detection System - Physical Hardware Reference Code
+  Target: Arduino Uno
+  Components:
+   - Red LED (Pin 8)
+   - Green LED (Pin 9)
+   - Buzzer (Pin 10)
+   - LCD 16x2 (RS: 12, E: 11, D4: 5, D5: 4, D6: 3, D7: 2)
+*/
+
+#include <LiquidCrystal.h>
+
+// Initialize LCD with pin mapping
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+const int RED_LED_PIN = 8;
+const int GREEN_LED_PIN = 9;
+const int BUZZER_PIN = 10;
+
+void setup() {
+  pinMode(RED_LED_PIN, OUTPUT);
+  pinMode(GREEN_LED_PIN, OUTPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+
+  lcd.begin(16, 2);
+  lcd.print("SYSTEM START...");
+  delay(1500);
+  systemClear();
+}
+
+void loop() {
+  // Example demonstration loop for physical hardware testing
+  // In a real integrated setup, this would listen to Serial commands from USB.
+  
+  // Safe State Example
+  systemClear();
+  delay(4000);
+
+  // Metal Alert State Example
+  metalDetected();
+  delay(4000);
+}
+
+void metalDetected() {
+  digitalWrite(RED_LED_PIN, HIGH);
+  digitalWrite(GREEN_LED_PIN, LOW);
+  digitalWrite(BUZZER_PIN, HIGH);
+
+  lcd.setCursor(0, 0);
+  lcd.print("METAL DETECTED  ");
+  lcd.setCursor(0, 1);
+  lcd.print("SYSTEM ALERT    ");
+}
+
+void systemClear() {
+  digitalWrite(RED_LED_PIN, LOW);
+  digitalWrite(GREEN_LED_PIN, HIGH);
+  digitalWrite(BUZZER_PIN, LOW);
+
+  lcd.setCursor(0, 0);
+  lcd.print("SYSTEM READY    ");
+  lcd.setCursor(0, 1);
+  lcd.print("NO METAL        ");
+}
+
+void systemAnalyzing() {
+  digitalWrite(RED_LED_PIN, LOW);
+  digitalWrite(GREEN_LED_PIN, LOW);
+  digitalWrite(BUZZER_PIN, LOW);
+
+  lcd.setCursor(0, 0);
+  lcd.print("ANALYZING...    ");
+  lcd.setCursor(0, 1);
+  lcd.print("SCANNING FRAME  ");
+}

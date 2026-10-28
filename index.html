@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Metal Detection System</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- TensorFlow.js and COCO-SSD -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
+</head>
+<body>
+    <!-- Top System Banner / Disclaimer -->
+    <div class="disclaimer-banner">
+        <i class="fa-solid fa-triangle-exclamation"></i> Disclaimer: This system performs visual object classification and does not scientifically verify material composition.
+    </div>
+
+    <div class="app-container" id="appContainer">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1>AI METAL DETECTION SYSTEM</h1>
+                <p class="subtitle">WEBCAM-BASED COMPUTER VISION + DIGITAL ARDUINO SIMULATION</p>
+            </div>
+            <div class="header-right">
+                <div class="status-badge online" id="systemBadge">
+                    <span class="pulse-dot"></span> SYSTEM ONLINE
+                </div>
+                <button class="btn-primary" id="presentationBtn" onclick="togglePresentationMode()">
+                    <i class="fa-solid fa-expand"></i> PRESENTATION MODE
+                </button>
+            </div>
+        </header>
+
+        <!-- INITIALIZER OVERLAY -->
+        <div class="init-overlay" id="initOverlay">
+            <div class="init-card">
+                <h2><i class="fa-solid fa-microchip"></i> System Initializing</h2>
+                <ul class="init-list" id="initList">
+                    <li id="init-web" class="pending"><i class="fa-regular fa-circle"></i> Web Interface</li>
+                    <li id="init-cam" class="pending"><i class="fa-regular fa-circle"></i> Camera API</li>
+                    <li id="init-ai" class="pending"><i class="fa-regular fa-circle"></i> AI Model (COCO-SSD)</li>
+                    <li id="init-ard" class="pending"><i class="fa-regular fa-circle"></i> Digital Arduino Controller</li>
+                    <li id="init-eng" class="pending"><i class="fa-regular fa-circle"></i> Detection Engine</li>
+                </ul>
+                <button class="btn-success" id="startSystemBtn" onclick="initializeSystem()" disabled>
+                    START SYSTEM
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN GRID LAYOUT -->
+        <main class="dashboard-grid">
+            
+            <!-- LEFT COLUMN: CAMERA & CONTROLS -->
+            <section class="card camera-section">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-video"></i> LIVE CAMERA</h2>
+                    <span class="camera-status" id="camStatusBadge">OFFLINE</span>
+                </div>
+                <div class="video-container">
+                    <video id="webcam" autoplay playsinline muted></video>
+                    <canvas id="canvasOverlay"></canvas>
+                    <div class="scan-line"></div>
+                </div>
+                <div class="control-panel">
+                    <button class="btn-action" id="startCamBtn" onclick="startCamera()">
+                        <i class="fa-solid fa-play"></i> START CAMERA
+                    </button>
+                    <button class="btn-action secondary" id="stopCamBtn" onclick="stopCamera()" disabled>
+                        <i class="fa-solid fa-stop"></i> STOP CAMERA
+                    </button>
+                    <button class="btn-action accent" id="startDetectBtn" onclick="toggleDetection()" disabled>
+                        <i class="fa-solid fa-eye"></i> START DETECTION
+                    </button>
+                    <button class="btn-action danger" onclick="captureSnapshot()">
+                        <i class="fa-solid fa-camera"></i> CAPTURE
+                    </button>
+                </div>
+            </section>
+
+            <!-- MIDDLE COLUMN: STATUS & METRICS -->
+            <section class="card status-section">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-chart-line"></i> DETECTION STATUS</h2>
+                </div>
+                
+                <div class="status-card-large" id="mainStatusCard">
+                    <div class="status-icon" id="mainStatusIcon">🟢</div>
+                    <div class="status-text-group">
+                        <h3 id="mainStatusTitle">NO METAL DETECTED</h3>
+                        <p id="mainStatusSub">SYSTEM SAFE</p>
+                    </div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-box">
+                        <span class="metric-label">DETECTED OBJECT</span>
+                        <span class="metric-value" id="objectNameVal">---</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">DETECTION TIME</span>
+                        <span class="metric-value mono" id="timeVal">--:--:--</span>
+                    </div>
+                </div>
+
+                <div class="confidence-container">
+                    <div class="confidence-header">
+                        <span>CONFIDENCE</span>
+                        <span class="mono" id="confVal">0.0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="confProgress"></div>
+                    </div>
+                </div>
+
+                <!-- COUNTERS -->
+                <div class="counters-row">
+                    <div class="counter-item">
+                        <span class="c-title">TOTAL</span>
+                        <span class="c-val" id="totalCount">0</span>
+                    </div>
+                    <div class="counter-item safe">
+                        <span class="c-title">CLEAR</span>
+                        <span class="c-val" id="clearCount">0</span>
+                    </div>
+                    <div class="counter-item alert">
+                        <span class="c-title">ALERT</span>
+                        <span class="c-val" id="alertCount">0</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT COLUMN: DIGITAL ARDUINO CONTROLLER -->
+            <section class="card arduino-section">
+                <div class="card-header">
+                    <h2><i class="fa-solid microchip"></i> DIGITAL ARDUINO CONTROLLER</h2>
+                    <span class="arduino-badge"><span class="pulse-dot"></span> ONLINE</span>
+                </div>
+
+                <!-- VIRTUAL LCD 16X2 -->
+                <div class="lcd-screen" id="lcdScreen">
+                    <div class="lcd-line" id="lcdLine1">SYSTEM READY    </div>
+                    <div class="lcd-line" id="lcdLine2">NO METAL        </div>
+                </div>
+
+                <!-- DIGITAL OUTPUT PANEL -->
+                <div class="outputs-panel">
+                    <h3>DIGITAL OUTPUT</h3>
+                    
+                    <div class="output-row" id="rowRedLed">
+                        <div class="output-info">
+                            <span class="led-indicator red-led" id="uiRedLed"></span>
+                            <span>RED LED</span>
+                        </div>
+                        <span class="state-badge" id="stateRedLed">OFF</span>
+                    </div>
+
+                    <div class="output-row" id="rowGreenLed">
+                        <div class="output-info">
+                            <span class="led-indicator green-led active" id="uiGreenLed"></span>
+                            <span>GREEN LED</span>
+                        </div>
+                        <span class="state-badge green" id="stateGreenLed">ON</span>
+                    </div>
+
+                    <div class="output-row" id="rowBuzzer">
+                        <div class="output-info">
+                            <i class="fa-solid fa-volume-high buzzer-icon" id="uiBuzzerIcon"></i>
+                            <span>BUZZER ALARM</span>
+                        </div>
+                        <span class="state-badge" id="stateBuzzer">OFF</span>
+                    </div>
+                </div>
+
+                <!-- HISTORY PANEL -->
+                <div class="history-container">
+                    <h4>DETECTION HISTORY</h4>
+                    <div class="history-list" id="historyList">
+                        <div class="history-empty">No detections recorded yet.</div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- SCRIPT REFERENCE -->
+    <script src="script.js"></script>
+</body>
+</html>
